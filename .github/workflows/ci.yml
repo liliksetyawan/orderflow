@@ -30,9 +30,11 @@ jobs:
         run: go vet ./...
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        # action@v7 is the v2-compatible action; golangci-lint v2.x is built
+        # with Go 1.24+ so it can analyze code targeting Go 1.25.
+        uses: golangci/golangci-lint-action@v7
         with:
-          version: v1.61
+          version: v2.5.0
 
   build-test:
     name: Build + test (race + coverage)
