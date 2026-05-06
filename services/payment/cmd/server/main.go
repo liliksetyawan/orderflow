@@ -14,6 +14,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 
 	"github.com/liliksetyawan/orderflow/pkg/dbmigrate"
@@ -42,6 +43,11 @@ func main() {
 }
 
 func run() error {
+	// Best-effort .env load for local dev. godotenv is non-overwriting,
+	// so production env (k8s, ECS, etc.) always wins. Missing .env is
+	// expected outside dev — silently continue.
+	_ = godotenv.Load()
+
 	cfg, err := config.Load()
 	if err != nil {
 		return fmt.Errorf("load config: %w", err)
