@@ -5,7 +5,7 @@ package port
 import (
 	"context"
 
-	"github.com/lilik-setyawan/orderflow/services/inventory/internal/domain"
+	"github.com/liliksetyawan/orderflow/services/inventory/internal/domain"
 )
 
 // ReservationRepository is the persistence port for the Reservation

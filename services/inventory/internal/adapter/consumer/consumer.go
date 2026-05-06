@@ -11,11 +11,11 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/rs/zerolog"
 
-	"github.com/lilik-setyawan/orderflow/pkg/events"
-	"github.com/lilik-setyawan/orderflow/pkg/idempotency"
-	"github.com/lilik-setyawan/orderflow/pkg/rabbitmq"
-	"github.com/lilik-setyawan/orderflow/services/inventory/internal/app/usecase"
-	"github.com/lilik-setyawan/orderflow/services/inventory/internal/domain"
+	"github.com/liliksetyawan/orderflow/pkg/events"
+	"github.com/liliksetyawan/orderflow/pkg/idempotency"
+	"github.com/liliksetyawan/orderflow/pkg/rabbitmq"
+	"github.com/liliksetyawan/orderflow/services/inventory/internal/app/usecase"
+	"github.com/liliksetyawan/orderflow/services/inventory/internal/domain"
 )
 
 const (

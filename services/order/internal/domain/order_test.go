@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/lilik-setyawan/orderflow/services/order/internal/domain"
+	"github.com/liliksetyawan/orderflow/services/order/internal/domain"
 )
 
 func items() []domain.Item {

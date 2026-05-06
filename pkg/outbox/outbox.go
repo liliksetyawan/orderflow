@@ -20,7 +20,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog"
 
-	"github.com/lilik-setyawan/orderflow/pkg/events"
+	"github.com/liliksetyawan/orderflow/pkg/events"
 )
 
 // Schema is the SQL for the outbox table. Embed verbatim in service migrations.

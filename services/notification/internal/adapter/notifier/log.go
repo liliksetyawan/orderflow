@@ -9,8 +9,8 @@ import (
 
 	"github.com/rs/zerolog"
 
-	"github.com/lilik-setyawan/orderflow/services/notification/internal/app/port"
-	"github.com/lilik-setyawan/orderflow/services/notification/internal/domain"
+	"github.com/liliksetyawan/orderflow/services/notification/internal/app/port"
+	"github.com/liliksetyawan/orderflow/services/notification/internal/domain"
 )
 
 type Log struct {

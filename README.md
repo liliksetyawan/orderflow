@@ -2,7 +2,7 @@
 
 > Production-grade event-driven order processing on Go microservices, demonstrating the **Saga pattern**, **Outbox pattern**, **idempotent consumers**, and **distributed tracing** end-to-end.
 
-[![CI](https://github.com/lilik-setyawan/orderflow/actions/workflows/ci.yml/badge.svg)](https://github.com/lilik-setyawan/orderflow/actions/workflows/ci.yml)
+[![CI](https://github.com/liliksetyawan/orderflow/actions/workflows/ci.yml/badge.svg)](https://github.com/liliksetyawan/orderflow/actions/workflows/ci.yml)
 ![Go](https://img.shields.io/badge/Go-1.25-00ADD8?logo=go)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 

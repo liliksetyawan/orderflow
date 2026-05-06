@@ -8,9 +8,9 @@ import (
 
 	"github.com/rs/zerolog"
 
-	"github.com/lilik-setyawan/orderflow/pkg/events"
-	"github.com/lilik-setyawan/orderflow/services/inventory/internal/app/port"
-	"github.com/lilik-setyawan/orderflow/services/inventory/internal/domain"
+	"github.com/liliksetyawan/orderflow/pkg/events"
+	"github.com/liliksetyawan/orderflow/services/inventory/internal/app/port"
+	"github.com/liliksetyawan/orderflow/services/inventory/internal/domain"
 )
 
 type ReserveInventory struct {

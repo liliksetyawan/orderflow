@@ -10,10 +10,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
-	"github.com/lilik-setyawan/orderflow/pkg/events"
-	"github.com/lilik-setyawan/orderflow/services/inventory/internal/app/port/mocks"
-	"github.com/lilik-setyawan/orderflow/services/inventory/internal/app/usecase"
-	"github.com/lilik-setyawan/orderflow/services/inventory/internal/domain"
+	"github.com/liliksetyawan/orderflow/pkg/events"
+	"github.com/liliksetyawan/orderflow/services/inventory/internal/app/port/mocks"
+	"github.com/liliksetyawan/orderflow/services/inventory/internal/app/usecase"
+	"github.com/liliksetyawan/orderflow/services/inventory/internal/domain"
 )
 
 func newReserveUC(t *testing.T) (*usecase.ReserveInventory, *mocks.MockReservationRepository, *mocks.MockIDGenerator) {

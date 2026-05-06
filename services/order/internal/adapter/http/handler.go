@@ -11,8 +11,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
 
-	"github.com/lilik-setyawan/orderflow/services/order/internal/app/usecase"
-	"github.com/lilik-setyawan/orderflow/services/order/internal/domain"
+	"github.com/liliksetyawan/orderflow/services/order/internal/app/usecase"
+	"github.com/liliksetyawan/orderflow/services/order/internal/domain"
 )
 
 type OrderHandler struct {

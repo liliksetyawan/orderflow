@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/lilik-setyawan/orderflow/pkg/events"
-	"github.com/lilik-setyawan/orderflow/services/order/internal/domain"
+	"github.com/liliksetyawan/orderflow/pkg/events"
+	"github.com/liliksetyawan/orderflow/services/order/internal/domain"
 )
 
 func TestRoutingKey_AllKnownTypes(t *testing.T) {

@@ -10,10 +10,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
-	"github.com/lilik-setyawan/orderflow/pkg/events"
-	"github.com/lilik-setyawan/orderflow/services/payment/internal/app/port/mocks"
-	"github.com/lilik-setyawan/orderflow/services/payment/internal/app/usecase"
-	"github.com/lilik-setyawan/orderflow/services/payment/internal/domain"
+	"github.com/liliksetyawan/orderflow/pkg/events"
+	"github.com/liliksetyawan/orderflow/services/payment/internal/app/port/mocks"
+	"github.com/liliksetyawan/orderflow/services/payment/internal/app/usecase"
+	"github.com/liliksetyawan/orderflow/services/payment/internal/domain"
 )
 
 func newReleaseUC(t *testing.T) (*usecase.ReleasePayment, *mocks.MockPaymentRepository, *mocks.MockIDGenerator, *mocks.MockPaymentGateway) {

@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/lilik-setyawan/orderflow/pkg/events"
+	"github.com/liliksetyawan/orderflow/pkg/events"
 )
 
 func TestNew_PopulatesAllFields(t *testing.T) {

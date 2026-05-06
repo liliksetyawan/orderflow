@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/lilik-setyawan/orderflow/services/notification/internal/domain"
+	"github.com/liliksetyawan/orderflow/services/notification/internal/domain"
 )
 
 func TestNew_HappyPath(t *testing.T) {

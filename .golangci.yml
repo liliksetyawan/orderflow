@@ -36,7 +36,7 @@ linters:
 
 linters-settings:
   goimports:
-    local-prefixes: github.com/lilik-setyawan/orderflow
+    local-prefixes: github.com/liliksetyawan/orderflow
   errcheck:
     # Don't fail on these idiomatic ignores; we already audit them at review time.
     exclude-functions:

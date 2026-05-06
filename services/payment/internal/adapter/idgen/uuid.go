@@ -5,7 +5,7 @@ package idgen
 import (
 	"github.com/google/uuid"
 
-	"github.com/lilik-setyawan/orderflow/services/payment/internal/app/port"
+	"github.com/liliksetyawan/orderflow/services/payment/internal/app/port"
 )
 
 type UUIDv7 struct{}

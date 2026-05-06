@@ -5,7 +5,7 @@ package port
 import (
 	"context"
 
-	"github.com/lilik-setyawan/orderflow/services/payment/internal/domain"
+	"github.com/liliksetyawan/orderflow/services/payment/internal/domain"
 )
 
 // PaymentRepository is the persistence port for the Payment aggregate.

@@ -3,8 +3,8 @@ package postgres
 import (
 	"fmt"
 
-	"github.com/lilik-setyawan/orderflow/pkg/events"
-	"github.com/lilik-setyawan/orderflow/services/order/internal/domain"
+	"github.com/liliksetyawan/orderflow/pkg/events"
+	"github.com/liliksetyawan/orderflow/services/order/internal/domain"
 )
 
 // outboxRecord is the row we INSERT into outbox.

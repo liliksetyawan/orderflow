@@ -13,8 +13,8 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/lilik-setyawan/orderflow/services/inventory/internal/app/port"
-	"github.com/lilik-setyawan/orderflow/services/inventory/internal/domain"
+	"github.com/liliksetyawan/orderflow/services/inventory/internal/app/port"
+	"github.com/liliksetyawan/orderflow/services/inventory/internal/domain"
 )
 
 type Repository struct {

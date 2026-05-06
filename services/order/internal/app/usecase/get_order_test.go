@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
-	"github.com/lilik-setyawan/orderflow/services/order/internal/app/port/mocks"
-	"github.com/lilik-setyawan/orderflow/services/order/internal/app/usecase"
-	"github.com/lilik-setyawan/orderflow/services/order/internal/domain"
+	"github.com/liliksetyawan/orderflow/services/order/internal/app/port/mocks"
+	"github.com/liliksetyawan/orderflow/services/order/internal/app/usecase"
+	"github.com/liliksetyawan/orderflow/services/order/internal/domain"
 )
 
 func TestGetOrder_HappyPath(t *testing.T) {

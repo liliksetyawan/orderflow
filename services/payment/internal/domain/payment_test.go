@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/lilik-setyawan/orderflow/services/payment/internal/domain"
+	"github.com/liliksetyawan/orderflow/services/payment/internal/domain"
 )
 
 func TestNewPayment_HappyPath(t *testing.T) {

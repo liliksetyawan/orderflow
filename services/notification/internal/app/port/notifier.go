@@ -3,7 +3,7 @@ package port
 import (
 	"context"
 
-	"github.com/lilik-setyawan/orderflow/services/notification/internal/domain"
+	"github.com/liliksetyawan/orderflow/services/notification/internal/domain"
 )
 
 // Notifier is the outbound port for delivering a notification. Each

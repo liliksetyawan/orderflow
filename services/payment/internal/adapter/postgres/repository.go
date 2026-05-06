@@ -17,8 +17,8 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/lilik-setyawan/orderflow/services/payment/internal/app/port"
-	"github.com/lilik-setyawan/orderflow/services/payment/internal/domain"
+	"github.com/liliksetyawan/orderflow/services/payment/internal/app/port"
+	"github.com/liliksetyawan/orderflow/services/payment/internal/domain"
 )
 
 type Repository struct {
