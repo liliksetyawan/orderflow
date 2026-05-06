@@ -22,7 +22,7 @@ func TestNew_HappyPath(t *testing.T) {
 
 func TestNew_RejectsEmptyFields(t *testing.T) {
 	cases := []struct {
-		name                                       string
+		name                              string
 		id, order, customer, typ, channel string
 	}{
 		{"empty id", "", "o1", "c1", "T", "log"},

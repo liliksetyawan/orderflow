@@ -4,8 +4,8 @@
 // trace without parsing the inner payload. The envelope carries:
 //
 //   - ID           globally unique event id (uuid v7) — sent as the AMQP
-//                  MessageId by the publisher and used by consumers as the
-//                  idempotency key
+//     MessageId by the publisher and used by consumers as the
+//     idempotency key
 //   - Type         dotted name, e.g. "order.created.v1"
 //   - OccurredAt   when the event was produced (not when published)
 //   - TraceParent  W3C traceparent header — keeps spans linked across the bus
@@ -38,7 +38,7 @@ func New(id, typ string, payload any) (Envelope, error) {
 	}, nil
 }
 
-func (e Envelope) Marshal() ([]byte, error)      { return json.Marshal(e) }
+func (e Envelope) Marshal() ([]byte, error) { return json.Marshal(e) }
 func Unmarshal(b []byte) (Envelope, error) {
 	var e Envelope
 	err := json.Unmarshal(b, &e)
@@ -47,13 +47,13 @@ func Unmarshal(b []byte) (Envelope, error) {
 
 // Common event type constants. Versioned so we can evolve payloads safely.
 const (
-	TypeOrderCreated       = "order.created.v1"
-	TypeOrderConfirmed     = "order.confirmed.v1"
-	TypeOrderCanceled      = "order.canceled.v1"
-	TypePaymentAuthorized  = "payment.authorized.v1"
-	TypePaymentFailed      = "payment.failed.v1"
-	TypePaymentReleased    = "payment.released.v1"
-	TypeInventoryReserved  = "inventory.reserved.v1"
-	TypeInventoryFailed    = "inventory.failed.v1"
-	TypeInventoryReleased  = "inventory.released.v1"
+	TypeOrderCreated      = "order.created.v1"
+	TypeOrderConfirmed    = "order.confirmed.v1"
+	TypeOrderCanceled     = "order.canceled.v1"
+	TypePaymentAuthorized = "payment.authorized.v1"
+	TypePaymentFailed     = "payment.failed.v1"
+	TypePaymentReleased   = "payment.released.v1"
+	TypeInventoryReserved = "inventory.reserved.v1"
+	TypeInventoryFailed   = "inventory.failed.v1"
+	TypeInventoryReleased = "inventory.released.v1"
 )

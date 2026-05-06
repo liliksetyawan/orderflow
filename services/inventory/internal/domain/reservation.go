@@ -16,14 +16,14 @@ const (
 )
 
 type Reservation struct {
-	ID         string
-	OrderID    string
-	Items      []Item
-	Status     ReservationStatus
-	Reason     string // populated only when FAILED
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
-	Version    int
+	ID        string
+	OrderID   string
+	Items     []Item
+	Status    ReservationStatus
+	Reason    string // populated only when FAILED
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Version   int
 }
 
 type Item struct {

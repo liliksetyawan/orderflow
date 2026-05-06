@@ -23,7 +23,7 @@ func TestNewPayment_HappyPath(t *testing.T) {
 
 func TestNewPayment_RejectsEmptyFields(t *testing.T) {
 	cases := []struct {
-		name                       string
+		name                string
 		id, order, customer string
 		amount              int64
 	}{

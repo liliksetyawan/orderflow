@@ -84,16 +84,16 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("rabbitmq: %w", err)
 	}
-	defer mq.Close()
+	defer observability.CloseOrLog(logger, "rabbitmq", mq)
 
 	publisher, err := rabbitmq.NewPublisher(mq)
 	if err != nil {
 		return fmt.Errorf("rabbitmq publisher: %w", err)
 	}
-	defer publisher.Close()
+	defer observability.CloseOrLog(logger, "rabbitmq-publisher", publisher)
 
 	rdb := redis.NewClient(&redis.Options{Addr: cfg.RedisAddr})
-	defer rdb.Close()
+	defer observability.CloseOrLog(logger, "redis", rdb)
 	if err := rdb.Ping(rootCtx).Err(); err != nil {
 		return fmt.Errorf("redis ping: %w", err)
 	}

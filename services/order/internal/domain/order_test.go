@@ -36,9 +36,9 @@ func TestNewOrder_RejectsEmptyItems(t *testing.T) {
 
 func TestNewOrder_RejectsBadItem(t *testing.T) {
 	cases := map[string][]domain.Item{
-		"empty sku":     {{SKU: "", Quantity: 1, Price: 100}},
-		"zero qty":      {{SKU: "A", Quantity: 0, Price: 100}},
-		"negative qty":  {{SKU: "A", Quantity: -1, Price: 100}},
+		"empty sku":      {{SKU: "", Quantity: 1, Price: 100}},
+		"zero qty":       {{SKU: "A", Quantity: 0, Price: 100}},
+		"negative qty":   {{SKU: "A", Quantity: -1, Price: 100}},
 		"negative price": {{SKU: "A", Quantity: 1, Price: -1}},
 	}
 	for name, its := range cases {

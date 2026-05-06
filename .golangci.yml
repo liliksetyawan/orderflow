@@ -22,9 +22,13 @@ linters:
 
   settings:
     errcheck:
-      # Don't fail on these idiomatic ignores; we audit them at review time.
+      # Don't fail on these idiomatic ignores. The amqp.Channel close in
+      # Connect / DeclareQueue / consumer goroutines is on a short-lived
+      # internal channel; logging the error adds noise without value.
+      # For long-lived resources in main.go we use observability.CloseOrLog
+      # which both calls Close and logs failures.
       exclude-functions:
-        - (io.Closer).Close
+        - (*github.com/rabbitmq/amqp091-go.Channel).Close
         - (github.com/jackc/pgx/v5.Tx).Rollback
 
   exclusions:
