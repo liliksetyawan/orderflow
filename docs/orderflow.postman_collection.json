@@ -1,0 +1,392 @@
+{
+  "info": {
+    "_postman_id": "7f9e3a2b-1234-4567-89ab-cdef01234567",
+    "name": "OrderFlow",
+    "description": "Saga-based event-driven microservices demo. Run `make up && make run-order && make run-payment && make run-inventory && make run-notification` first, then walk the folders 01 → 05 in order.\n\nThe POST in folder 01 saves the returned order id to the collection variable `order_id`, so the GET request beneath it just works.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 — Happy path",
+      "item": [
+        {
+          "name": "Create order (SKU A × 3) — happy path",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201 Created', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.test('Returns id + status PENDING', () => {",
+                  "    pm.expect(body).to.have.property('id');",
+                  "    pm.expect(body.status).to.eql('PENDING');",
+                  "});",
+                  "pm.collectionVariables.set('order_id', body.id);",
+                  "console.log('Saved order_id =', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"c1\",\n  \"items\": [\n    { \"sku\": \"A\", \"quantity\": 3, \"price\": 1000 }\n  ]\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{order_base_url}}/v1/orders",
+              "host": ["{{order_base_url}}"],
+              "path": ["v1", "orders"]
+            },
+            "description": "Triggers the saga: order.created.v1 + payment.authorize.v1 are published. Mock payment gateway succeeds ~85% of the time (controlled by PAYMENT_GATEWAY_SUCCESS_RATE). On success: stock for A decrements 100 → 97, order moves PENDING → AUTHORIZED → CONFIRMED, and the notification service logs the confirmation."
+          }
+        },
+        {
+          "name": "Get order by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Status is one of CONFIRMED/AUTHORIZED/PENDING/CANCELED', () => {",
+                  "    pm.expect(['PENDING','AUTHORIZED','CONFIRMED','CANCELED']).to.include(body.status);",
+                  "});",
+                  "console.log('Order status =', body.status);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{order_base_url}}/v1/orders/{{order_id}}",
+              "host": ["{{order_base_url}}"],
+              "path": ["v1", "orders", "{{order_id}}"]
+            },
+            "description": "Run a few seconds after the POST so the saga has time to fan out. Status should land on CONFIRMED for happy-path orders."
+          }
+        },
+        {
+          "name": "Create order (multi-item)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.test('Total = sum(qty * price)', () => {",
+                  "    pm.expect(body.total).to.eql(2 * 1000 + 1 * 5000);",
+                  "});",
+                  "pm.collectionVariables.set('order_id', body.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"c1\",\n  \"items\": [\n    { \"sku\": \"A\", \"quantity\": 2, \"price\": 1000 },\n    { \"sku\": \"B\", \"quantity\": 1, \"price\": 5000 }\n  ]\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{order_base_url}}/v1/orders",
+              "host": ["{{order_base_url}}"],
+              "path": ["v1", "orders"]
+            },
+            "description": "Reserves both A and B atomically: if either is short, the entire reservation rolls back."
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 — Compensation: insufficient stock",
+      "item": [
+        {
+          "name": "Create order (SKU D × 11) — D seeded with qty 10",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201 (saga starts even though it will fail later)', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('order_id', pm.response.json().id);",
+                  "console.log('Watch order; expected to land on CANCELED via inventory.failed → payment.release path');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"c1\",\n  \"items\": [\n    { \"sku\": \"D\", \"quantity\": 11, \"price\": 1000 }\n  ]\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{order_base_url}}/v1/orders",
+              "host": ["{{order_base_url}}"],
+              "path": ["v1", "orders"]
+            },
+            "description": "D is seeded with quantity=10. Asking for 11 triggers ErrInsufficientStock in the inventory service.\n\nFlow: order PENDING → payment AUTHORIZED → inventory FAILED → order CANCELED + payment.release.v1 → payment RELEASED → order.canceled.v1 → notification logs cancellation."
+          }
+        },
+        {
+          "name": "Get order — should be CANCELED",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{order_base_url}}/v1/orders/{{order_id}}",
+              "host": ["{{order_base_url}}"],
+              "path": ["v1", "orders", "{{order_id}}"]
+            },
+            "description": "After the saga compensates, status should be CANCELED. Run a few seconds after the POST."
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 — Compensation: unknown SKU",
+      "item": [
+        {
+          "name": "Create order (SKU Z — not seeded)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('order_id', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"c1\",\n  \"items\": [\n    { \"sku\": \"Z\", \"quantity\": 1, \"price\": 100 }\n  ]\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{order_base_url}}/v1/orders",
+              "host": ["{{order_base_url}}"],
+              "path": ["v1", "orders"]
+            },
+            "description": "Z does not exist in the stocks table. The conditional UPDATE WHERE sku=$sku AND quantity>=$n returns 0 rows affected, which inventory treats the same as ErrInsufficientStock — saga compensates."
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 — Validation errors",
+      "item": [
+        {
+          "name": "Empty items array — 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status is 400', () => pm.response.to.have.status(400));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"c1\",\n  \"items\": []\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{order_base_url}}/v1/orders",
+              "host": ["{{order_base_url}}"],
+              "path": ["v1", "orders"]
+            },
+            "description": "domain.NewOrder rejects empty items with ErrEmptyItems. Handler returns 400."
+          }
+        },
+        {
+          "name": "Missing customer_id — 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status is 400', () => pm.response.to.have.status(400));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    { \"sku\": \"A\", \"quantity\": 1, \"price\": 100 }\n  ]\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{order_base_url}}/v1/orders",
+              "host": ["{{order_base_url}}"],
+              "path": ["v1", "orders"]
+            }
+          }
+        },
+        {
+          "name": "Negative quantity — 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status is 400', () => pm.response.to.have.status(400));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"c1\",\n  \"items\": [\n    { \"sku\": \"A\", \"quantity\": -1, \"price\": 100 }\n  ]\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{order_base_url}}/v1/orders",
+              "host": ["{{order_base_url}}"],
+              "path": ["v1", "orders"]
+            }
+          }
+        },
+        {
+          "name": "Invalid JSON — 400",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{not json",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{order_base_url}}/v1/orders",
+              "host": ["{{order_base_url}}"],
+              "path": ["v1", "orders"]
+            }
+          }
+        },
+        {
+          "name": "Get non-existent order — 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status is 404', () => pm.response.to.have.status(404));"]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{order_base_url}}/v1/orders/00000000-0000-0000-0000-000000000000",
+              "host": ["{{order_base_url}}"],
+              "path": ["v1", "orders", "00000000-0000-0000-0000-000000000000"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 — Health & readiness",
+      "item": [
+        {
+          "name": "Order /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{order_base_url}}/health",
+              "host": ["{{order_base_url}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Order /ready",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{order_base_url}}/ready",
+              "host": ["{{order_base_url}}"],
+              "path": ["ready"]
+            }
+          }
+        },
+        {
+          "name": "Payment /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{payment_base_url}}/health",
+              "host": ["{{payment_base_url}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Inventory /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{inventory_base_url}}/health",
+              "host": ["{{inventory_base_url}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Notification /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{notification_base_url}}/health",
+              "host": ["{{notification_base_url}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {"key": "order_base_url",        "value": "http://localhost:8081", "type": "string"},
+    {"key": "payment_base_url",      "value": "http://localhost:8082", "type": "string"},
+    {"key": "inventory_base_url",    "value": "http://localhost:8083", "type": "string"},
+    {"key": "notification_base_url", "value": "http://localhost:8084", "type": "string"},
+    {"key": "order_id",              "value": "",                       "type": "string"}
+  ]
+}
