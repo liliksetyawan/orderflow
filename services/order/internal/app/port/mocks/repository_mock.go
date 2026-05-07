@@ -70,6 +70,22 @@ func (mr *MockOrderRepositoryMockRecorder) Get(ctx, id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockOrderRepository)(nil).Get), ctx, id)
 }
 
+// List mocks base method.
+func (m *MockOrderRepository) List(ctx context.Context, status string, limit, offset int) ([]*domain.Order, int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "List", ctx, status, limit, offset)
+	ret0, _ := ret[0].([]*domain.Order)
+	ret1, _ := ret[1].(int)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// List indicates an expected call of List.
+func (mr *MockOrderRepositoryMockRecorder) List(ctx, status, limit, offset any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockOrderRepository)(nil).List), ctx, status, limit, offset)
+}
+
 // Save mocks base method.
 func (m *MockOrderRepository) Save(ctx context.Context, o *domain.Order, ev []domain.Event) error {
 	m.ctrl.T.Helper()

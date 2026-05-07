@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
@@ -18,13 +20,15 @@ import (
 type OrderHandler struct {
 	create *usecase.CreateOrder
 	get    *usecase.GetOrder
+	list   *usecase.ListOrders
 	log    zerolog.Logger
 }
 
-func NewOrderHandler(create *usecase.CreateOrder, get *usecase.GetOrder, log zerolog.Logger) *OrderHandler {
+func NewOrderHandler(create *usecase.CreateOrder, get *usecase.GetOrder, list *usecase.ListOrders, log zerolog.Logger) *OrderHandler {
 	return &OrderHandler{
 		create: create,
 		get:    get,
+		list:   list,
 		log:    log.With().Str("component", "http-handler").Logger(),
 	}
 }
@@ -77,6 +81,61 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusCreated, toResp(order))
+}
+
+type listItemDTO struct {
+	ID         string `json:"id"`
+	CustomerID string `json:"customer_id"`
+	Total      int64  `json:"total"`
+	Status     string `json:"status"`
+	CreatedAt  string `json:"created_at"`
+	UpdatedAt  string `json:"updated_at"`
+}
+
+type listResp struct {
+	Data   []listItemDTO `json:"data"`
+	Total  int           `json:"total"`
+	Limit  int           `json:"limit"`
+	Offset int           `json:"offset"`
+}
+
+// List handles GET /v1/orders?status=...&limit=...&offset=....
+// Items are not included in the list response — fetch via GET /v1/orders/{id}.
+func (h *OrderHandler) List(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	status := q.Get("status")
+	limit, _ := strconv.Atoi(q.Get("limit"))
+	offset, _ := strconv.Atoi(q.Get("offset"))
+
+	out, err := h.list.Execute(r.Context(), usecase.ListOrdersInput{
+		Status: status,
+		Limit:  limit,
+		Offset: offset,
+	})
+	if err != nil {
+		h.log.Error().Err(err).Msg("list orders")
+		writeErr(w, http.StatusInternalServerError, "internal error")
+		return
+	}
+
+	data := make([]listItemDTO, len(out.Orders))
+	for i, o := range out.Orders {
+		data[i] = listItemDTO{
+			ID:         o.ID,
+			CustomerID: o.CustomerID,
+			Total:      o.Total,
+			Status:     string(o.Status),
+			CreatedAt:  o.CreatedAt.UTC().Format(time.RFC3339Nano),
+			UpdatedAt:  o.UpdatedAt.UTC().Format(time.RFC3339Nano),
+		}
+	}
+
+	writeJSON(w, http.StatusOK, listResp{
+		Data:   data,
+		Total:  out.Total,
+		Limit:  out.Limit,
+		Offset: out.Offset,
+	})
 }
 
 func (h *OrderHandler) Get(w http.ResponseWriter, r *http.Request) {

@@ -84,6 +84,54 @@ func (r *Repository) Save(ctx context.Context, o *domain.Order, evs []domain.Eve
 	return tx.Commit(ctx)
 }
 
+func (r *Repository) List(ctx context.Context, status string, limit, offset int) ([]*domain.Order, int, error) {
+	if limit <= 0 || limit > 200 {
+		limit = 20
+	}
+	if offset < 0 {
+		offset = 0
+	}
+
+	// $1 doubles as "no filter" sentinel: empty string matches every row.
+	const countQ = `SELECT COUNT(*) FROM orders WHERE ($1 = '' OR status = $1)`
+	const listQ = `
+		SELECT id, customer_id, total, status, created_at, updated_at, version
+		  FROM orders
+		 WHERE ($1 = '' OR status = $1)
+		 ORDER BY created_at DESC
+		 LIMIT $2 OFFSET $3
+	`
+
+	var total int
+	if err := r.pool.QueryRow(ctx, countQ, status).Scan(&total); err != nil {
+		return nil, 0, fmt.Errorf("count orders: %w", err)
+	}
+
+	rows, err := r.pool.Query(ctx, listQ, status, limit, offset)
+	if err != nil {
+		return nil, 0, fmt.Errorf("list orders: %w", err)
+	}
+	defer rows.Close()
+
+	var orders []*domain.Order
+	for rows.Next() {
+		var (
+			o         domain.Order
+			statusStr string
+		)
+		if err := rows.Scan(&o.ID, &o.CustomerID, &o.Total, &statusStr,
+			&o.CreatedAt, &o.UpdatedAt, &o.Version); err != nil {
+			return nil, 0, fmt.Errorf("scan order: %w", err)
+		}
+		o.Status = domain.OrderStatus(statusStr)
+		orders = append(orders, &o)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("iterate orders: %w", err)
+	}
+	return orders, total, nil
+}
+
 func (r *Repository) Get(ctx context.Context, id string) (*domain.Order, error) {
 	var (
 		o         domain.Order

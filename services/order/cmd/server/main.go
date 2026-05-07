@@ -114,6 +114,7 @@ func run() error {
 	// Use cases (depend on ports only)
 	createUC := usecase.NewCreateOrder(repo, idGen, logger)
 	getUC := usecase.NewGetOrder(repo)
+	listUC := usecase.NewListOrders(repo)
 	sagaUC := usecase.NewSaga(repo, idGen, logger)
 
 	// Background workers
@@ -126,7 +127,7 @@ func run() error {
 	}
 
 	// Driving adapter: HTTP
-	handler := httpadapter.NewOrderHandler(createUC, getUC, logger)
+	handler := httpadapter.NewOrderHandler(createUC, getUC, listUC, logger)
 	srv := &nethttp.Server{
 		Addr:              fmt.Sprintf(":%d", cfg.HTTPPort),
 		Handler:           httpadapter.NewRouter(handler),

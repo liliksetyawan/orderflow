@@ -20,4 +20,10 @@ type OrderRepository interface {
 	Create(ctx context.Context, o *domain.Order, ev []domain.Event) error
 	Save(ctx context.Context, o *domain.Order, ev []domain.Event) error
 	Get(ctx context.Context, id string) (*domain.Order, error)
+
+	// List returns orders ordered by created_at DESC (newest first), plus
+	// the total row count for the same filter (for pagination). Items are
+	// not loaded — the list view doesn't need them and skipping the join
+	// keeps the query cheap. status="" means no filter.
+	List(ctx context.Context, status string, limit, offset int) (orders []*domain.Order, total int, err error)
 }
